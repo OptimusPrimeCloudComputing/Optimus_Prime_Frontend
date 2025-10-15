@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -9,21 +10,21 @@ function Header() {
     <header className="bg-white shadow-md sticky top-0 z-50">
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-blue-600">
+          <Link to="/" className="text-2xl font-bold text-blue-600">
             Optimus Prime Shop
-          </div>
+          </Link>
           <div className="hidden md:flex space-x-8 items-center">
-            <a href="#home" className="text-gray-700 hover:text-blue-600 transition duration-300">Home</a>
-            <a href="#products" className="text-gray-700 hover:text-blue-600 transition duration-300">Products</a>
-            <a href="#account" className="text-gray-700 hover:text-blue-600 transition duration-300">My Account</a>
-            <a href="#cart" className="text-gray-700 hover:text-blue-600 transition duration-300 relative">
+            <Link to="/" className="text-gray-700 hover:text-blue-600 transition duration-300">Home</Link>
+            <Link to="/products" className="text-gray-700 hover:text-blue-600 transition duration-300">Products</Link>
+            <Link to="/cart" className="text-gray-700 hover:text-blue-600 transition duration-300 relative">
               Cart
               {totalQuantity > 0 && (
                 <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {totalQuantity}
                 </span>
               )}
-            </a>
+            </Link>
+            <Link to="/account" className="text-gray-700 hover:text-blue-600 transition duration-300">My Account</Link>
           </div>
           {/* Mobile Menu Button */}
           <div className="md:hidden">
@@ -41,12 +42,12 @@ function Header() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4">
-            <a href="#home" className="block py-2 text-gray-700 hover:text-blue-600">Home</a>
-            <a href="#products" className="block py-2 text-gray-700 hover:text-blue-600">Products</a>
-            <a href="#account" className="block py-2 text-gray-700 hover:text-blue-600">My Account</a>
-            <a href="#cart" className="block py-2 text-gray-700 hover:text-blue-600">
+            <Link to="/" className="block py-2 text-gray-700 hover:text-blue-600" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+            <Link to="/products" className="block py-2 text-gray-700 hover:text-blue-600" onClick={() => setMobileMenuOpen(false)}>Products</Link>
+            <Link to="/account" className="block py-2 text-gray-700 hover:text-blue-600" onClick={() => setMobileMenuOpen(false)}>My Account</Link>
+            <Link to="/cart" className="block py-2 text-gray-700 hover:text-blue-600" onClick={() => setMobileMenuOpen(false)}>
               Cart {totalQuantity > 0 && `(${totalQuantity})`}
-            </a>
+            </Link>
           </div>
         )}
       </nav>
