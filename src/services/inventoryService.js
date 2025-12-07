@@ -1,6 +1,8 @@
 // Inventory Microservice Integration
 // Use proxy in development to avoid CORS issues, direct URL in production
-const INVENTORY_API_BASE = "http://34.170.237.251:8000";  // ⚠️ UPDATE THIS with your deployed inventory service URL
+const INVENTORY_API_BASE = import.meta.env.DEV 
+  ? "/api"  // Proxied through Vite dev server (avoids CORS in development)
+  : "https://www.columbiaexchangeinventory.com";  // Production HTTPS URL
 
 // API Endpoints
 const ENDPOINTS = {
