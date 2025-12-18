@@ -109,11 +109,13 @@ export const isAuthenticated = () => {
 };
 
 /**
- * Logout - clear stored tokens
+ * Logout - clear stored tokens and payment history
  */
 export const logout = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem('paymentHistory');
+  localStorage.removeItem('universityId');
 };
 
 /**
