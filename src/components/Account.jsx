@@ -715,34 +715,6 @@ function Account() {
                   {customerProfile ? 'My Profile' : 'Create Account'}
                 </h3>
 
-                {/* University ID Lookup - Only show for non-authenticated users */}
-                {!customerProfile && !isAuthenticated && (
-                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <label className="block text-gray-700 font-semibold mb-2">
-                      Have an account? Enter your University ID
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={currentUniversityId}
-                        onChange={(e) => setCurrentUniversityId(e.target.value)}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="UNI1234"
-                      />
-                      <button
-                        onClick={handleLoadProfile}
-                        disabled={isLoadingProfile}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 transition"
-                      >
-                        {isLoadingProfile ? 'Loading...' : 'Load'}
-                      </button>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Or <span className="text-blue-600 font-semibold">Sign in with Google</span> in the header for a better experience.
-                    </p>
-                  </div>
-                )}
-                
                 {/* New user signed in with Google - show welcome message */}
                 {!customerProfile && isAuthenticated && user && !user.university_id && (
                   <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
