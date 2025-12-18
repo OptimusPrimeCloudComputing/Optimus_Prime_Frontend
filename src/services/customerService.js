@@ -1,5 +1,7 @@
 // Customer Microservice Integration
 // Use proxy in development to avoid CORS issues, direct URL in production
+import { getAuthHeaders } from './authService';
+
 const CUSTOMER_API_BASE = "https://customermicroservice-453095374298.europe-west1.run.app";
 
 // API Endpoints
@@ -87,6 +89,7 @@ export const getCustomer = async (universityId) => {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        ...getAuthHeaders(),
       },
     });
 

@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { useState } from 'react'
 import { addToCart, removeFromCart, clearCart } from '../store/cartSlice'
-import { initiatePayment, getPayment, cancelPayment, dollarsToCents, centsToDollars } from '../services/paymentService'
+import { initiatePayment, getPayment, cancelPayment, updatePayment, dollarsToCents, centsToDollars } from '../services/paymentService'
 import { checkInventoryAvailability, reduceInventoryForPurchase } from '../services/inventoryService'
 
 function Cart() {
@@ -276,10 +276,19 @@ function Cart() {
       
       // Handle successful payment initiation
       const responsePaymentId = response.paymentId || response.payment_id
-      setPaymentId(responsePaymentId)
-      setPaymentDetails(response)
-      
       console.log('Payment initiated successfully:', responsePaymentId)
+      
+      // STEP 3.5: Mark payment as COMPLETED immediately (MVP - no Stripe integration)
+      try {
+        const completedPayment = await updatePayment(responsePaymentId, { status: 'COMPLETED' })
+        console.log('Payment marked as COMPLETED:', completedPayment)
+        setPaymentId(responsePaymentId)
+        setPaymentDetails({ ...response, status: 'COMPLETED' })
+      } catch (updateError) {
+        console.warn('Could not mark payment as completed, continuing with INITIATED status:', updateError)
+        setPaymentId(responsePaymentId)
+        setPaymentDetails(response)
+      }
       
       // STEP 4: Reduce inventory after successful payment
       try {

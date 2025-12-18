@@ -10,8 +10,10 @@ import {
   updateAddress,
   deleteAddress
 } from '../services/customerService'
+import { useAuth } from '../context/AuthContext'
 
 function Account() {
+  const { user, isAuthenticated } = useAuth()
   const [activeTab, setActiveTab] = useState('orders') // 'orders' or 'profile'
   
   // Payment state
@@ -69,12 +71,52 @@ function Account() {
     // Load payment history from localStorage
     loadPaymentHistory()
     
-    // Load customer profile if university ID exists
-    if (currentUniversityId) {
-      loadCustomerProfile(currentUniversityId)
-      loadCustomerAddresses(currentUniversityId)
+    // If authenticated with Google
+    if (isAuthenticated && user) {
+      if (user.university_id) {
+        // Returning user - auto-load profile
+        setCurrentUniversityId(user.university_id)
+        localStorage.setItem('universityId', user.university_id)
+        loadCustomerProfile(user.university_id)
+        loadCustomerAddresses(user.university_id)
+      } else {
+        // New user - pre-fill form with Google data
+        const nameParts = (user.name || '').split(' ')
+        setCustomerForm(prev => ({
+          ...prev,
+          email: user.email || '',
+          first_name: nameParts[0] || '',
+          last_name: nameParts.slice(1).join(' ') || '',
+        }))
+      }
+    } else if (!isAuthenticated) {
+      // User logged out - clear all profile state
+      setCustomerProfile(null)
+      setCurrentUniversityId('')
+      setAddresses([])
+      localStorage.removeItem('universityId')
+      // Reset customer form to empty state
+      setCustomerForm({
+        university_id: '',
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        birth_date: '',
+        status: 'active'
+      })
+      // Reset initial address form
+      setInitialAddress({
+        street: '',
+        city: '',
+        state: '',
+        postal_code: '',
+        country: 'USA'
+      })
+      setProfileMessage({ type: '', text: '' })
     }
-  }, [])
+  }, [isAuthenticated, user])
 
   // Reload payment history when page becomes visible
   useEffect(() => {
@@ -651,8 +693,8 @@ function Account() {
                   {customerProfile ? 'My Profile' : 'Create Account'}
                 </h3>
 
-                {/* University ID Lookup */}
-                {!customerProfile && (
+                {/* University ID Lookup - Only show for non-authenticated users */}
+                {!customerProfile && !isAuthenticated && (
                   <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <label className="block text-gray-700 font-semibold mb-2">
                       Have an account? Enter your University ID
@@ -673,6 +715,18 @@ function Account() {
                         {isLoadingProfile ? 'Loading...' : 'Load'}
                       </button>
                     </div>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Or <span className="text-blue-600 font-semibold">Sign in with Google</span> in the header for a better experience.
+                    </p>
+                  </div>
+                )}
+                
+                {/* New user signed in with Google - show welcome message */}
+                {!customerProfile && isAuthenticated && user && !user.university_id && (
+                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-green-800 font-semibold">
+                      Welcome, {user.name}! Complete your profile below to get started.
+                    </p>
                   </div>
                 )}
 
@@ -755,10 +809,14 @@ function Account() {
                         name="email"
                         value={customerForm.email}
                         onChange={handleCustomerFormChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                         placeholder="john@columbia.edu"
                         required
+                        disabled={isAuthenticated && !customerProfile}
                       />
+                      {isAuthenticated && !customerProfile && (
+                        <p className="text-xs text-gray-500 mt-1">Email from Google account</p>
+                      )}
                     </div>
 
                     {/* Phone */}
