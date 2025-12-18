@@ -279,15 +279,15 @@ function Cart() {
       console.log('Payment initiated successfully:', responsePaymentId)
       
       // STEP 3.5: Mark payment as COMPLETED immediately (MVP - no Stripe integration)
+      setPaymentId(responsePaymentId)
       try {
-        const completedPayment = await updatePayment(responsePaymentId, { status: 'COMPLETED' })
+        const completedPayment = await updatePayment(responsePaymentId, { status: 'completed' })
         console.log('Payment marked as COMPLETED:', completedPayment)
-        setPaymentId(responsePaymentId)
-        setPaymentDetails({ ...response, status: 'COMPLETED' })
+        setPaymentDetails({ ...completedPayment, status: 'COMPLETED' })
       } catch (updateError) {
-        console.warn('Could not mark payment as completed, continuing with INITIATED status:', updateError)
-        setPaymentId(responsePaymentId)
-        setPaymentDetails(response)
+        console.error('Could not mark payment as completed:', updateError)
+        // Still show as completed in UI for MVP
+        setPaymentDetails({ ...response, status: 'COMPLETED' })
       }
       
       // STEP 4: Reduce inventory after successful payment
@@ -311,14 +311,14 @@ function Cart() {
       
       setPaymentSuccess(true)
       
-      // Save to payment history
+      // Save to payment history with COMPLETED status (MVP)
       savePaymentToHistory({
         paymentId: responsePaymentId,
         orderId: orderId,
         amount: centsToDollars(amountInCents),
         amountCents: amountInCents,
         currency: 'USD',
-        status: response.status || 'INITIATED',
+        status: 'COMPLETED',
         method: 'CARD',
         items: cartItems.map(item => ({
           name: item.name,
