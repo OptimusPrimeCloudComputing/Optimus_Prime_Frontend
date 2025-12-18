@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { useState } from 'react'
 import { addToCart, removeFromCart, clearCart } from '../store/cartSlice'
-import { initiatePayment, getPayment, cancelPayment, updatePayment, dollarsToCents, centsToDollars } from '../services/paymentService'
+import { initiatePayment, getPayment, cancelPayment, dollarsToCents, centsToDollars } from '../services/paymentService'
 import { checkInventoryAvailability, reduceInventoryForPurchase } from '../services/inventoryService'
 
 function Cart() {
@@ -278,17 +278,8 @@ function Cart() {
       const responsePaymentId = response.paymentId || response.payment_id
       console.log('Payment initiated successfully:', responsePaymentId)
       
-      // STEP 3.5: Mark payment as COMPLETED immediately (MVP - no Stripe integration)
       setPaymentId(responsePaymentId)
-      try {
-        const completedPayment = await updatePayment(responsePaymentId, { status: 'completed' })
-        console.log('Payment marked as COMPLETED:', completedPayment)
-        setPaymentDetails({ ...completedPayment, status: 'COMPLETED' })
-      } catch (updateError) {
-        console.error('Could not mark payment as completed:', updateError)
-        // Still show as completed in UI for MVP
-        setPaymentDetails({ ...response, status: 'COMPLETED' })
-      }
+      setPaymentDetails(response)
       
       // STEP 4: Reduce inventory after successful payment
       try {
@@ -311,14 +302,14 @@ function Cart() {
       
       setPaymentSuccess(true)
       
-      // Save to payment history with COMPLETED status (MVP)
+      // Save to payment history
       savePaymentToHistory({
         paymentId: responsePaymentId,
         orderId: orderId,
         amount: centsToDollars(amountInCents),
         amountCents: amountInCents,
         currency: 'USD',
-        status: 'COMPLETED',
+        status: response.status || 'INITIATED',
         method: 'CARD',
         items: cartItems.map(item => ({
           name: item.name,
