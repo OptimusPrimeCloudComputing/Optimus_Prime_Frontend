@@ -328,7 +328,8 @@ function Cart() {
         createdAt: response.createdAt || new Date().toISOString(),
       })
       
-      // Don't auto-clear cart, let user view payment status first
+      // Clear cart after successful payment
+      dispatch(clearCart())
       
     } catch (error) {
       setPaymentError(error.message || 'Payment failed. Please try again.')
